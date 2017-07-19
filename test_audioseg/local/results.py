@@ -25,14 +25,14 @@ def read_wav(filename):
 def time_to_sample(time_stamp,fs):
     """
        Convert time value in seconds to sample. """
-    return 1 + int(time_stamp/float(fs))
+    return 1 + int(time_stamp*fs)
 
 def list_to_array(in_list):
     """
        Convert 1D list of numeric values to np array. 
        Added this because I had to use it several times. """
     out_array = np.array(in_list)
-    return out_array[:]
+    return out_array.reshape((len(in_list),1))
 
 def segs_to_stream(labels,segment_starts,segment_ends):
     """
@@ -40,10 +40,18 @@ def segs_to_stream(labels,segment_starts,segment_ends):
        into a single numpy array. This is for plotting purposes.
         """
     N = segment_ends[-1]
-    stream = np.zeros((1,N))
-    for i in range(len(labels)):
-        stream[segment_starts[i]:segment_ends[i]] = labels[i]
+    stream = np.zeros((N,1))
+    print labels.shape
+    for i in range(labels.shape[0]):
+        stream[segment_starts[i,0]:segment_ends[i,0]] = labels[i]
     return stream
+
+def rm_empties(in_list):
+    out_list = []
+    for i in in_list:
+        if i.strip()!='':
+            out_list.append(i)
+    return out_list
 
 def read_segs(filename, fs=16000.0):
     """
@@ -61,29 +69,31 @@ def read_segs(filename, fs=16000.0):
     segment_ends = []
     for i in fin:
         line = i.strip()
-        line_list = line.split(' ')
+        temp = line.split(' ')
+        line_list = rm_empties(temp)
         if line_list[0]=='sil':
             labels.append(0)
         elif line_list[0]=='speech':
             labels.append(1)
-        segment_starts.append(time_to_sample(str(line_list[1].strip()),fs))
-        segment_ends.append(time_to_sample(str(line_list[2].strip()),fs))
+        segment_starts.append(time_to_sample(float(line_list[1].strip()),fs))
+        segment_ends.append(time_to_sample(float(line_list[2].strip()),fs))
     fin.close()
-    labels = list_to_array(in_list)
+    labels = list_to_array(labels)
     segment_starts = list_to_array(segment_starts)
     segment_ends = list_to_array(segment_ends)
-    label_stream = segs_to_stream()
+    label_stream = segs_to_stream(labels,segment_starts,segment_ends)
     return label_stream
+
 if __name__=='__main__':
-    fname='/home/navid/data/ami_sample/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav'
+    fname='/Users/navidshokouhi/Downloads/unimaquarie/projects/ami_sample/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav'
     fs,s = read_wav(fname)
-    segname='/home/navid/spkr_diarization/test_audioseg/out_dir/ES2002a.sad'
+    fs = 16000.
+    segname='/Users/navidshokouhi/Software_dir/spkr_diarization/test_audioseg/out_dir/ES2002a.sad'
     labels = read_segs(segname,fs)
     pylab.plot(s)
     pylab.plot(labels)
     pylab.show()
-
-
+    #print len(labels)
 
 
 
