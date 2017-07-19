@@ -75,6 +75,9 @@ def read_segs(filename, fs=16000.0):
             labels.append(0)
         elif line_list[0]=='speech':
             labels.append(1)
+        elif 'C' in line_list[0]:
+            # For when reading cluster labels CX
+            labels.append(int(line_list[0][1:]))
         segment_starts.append(time_to_sample(float(line_list[1].strip()),fs))
         segment_ends.append(time_to_sample(float(line_list[2].strip()),fs))
     fin.close()
@@ -88,10 +91,10 @@ if __name__=='__main__':
     fname='/Users/navidshokouhi/Downloads/unimaquarie/projects/ami_sample/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav'
     fs,s = read_wav(fname)
     fs = 16000.
-    segname='/Users/navidshokouhi/Software_dir/spkr_diarization/test_audioseg/out_dir/ES2002a.sad'
+    segname='/Users/navidshokouhi/Software_dir/spkr_diarization/test_audioseg/out_dir/ES2002a.clusters'
     labels = read_segs(segname,fs)
     pylab.plot(s)
-    pylab.plot(labels)
+    pylab.plot(labels/40.)
     pylab.show()
     #print len(labels)
 
