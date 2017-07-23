@@ -23,10 +23,13 @@ def read_wav(filename):
     s = add_wgn(s) # Add jitter for numerical stability
     return fs,s
 
-def time_to_sample(time_stamp,fs):
+def time_to_sample(time_stamp,fs=16000.):
     """
        Convert time value in seconds to sample. """
     return 1 + int(time_stamp*fs)
+
+def sample_to_frames(nsamples,fs=16000.,frame_shift=0.01):
+    return int(nsamples/(frame_shift*fs))
 
 def list_to_array(in_list):
     """
@@ -106,6 +109,38 @@ def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
         i += 1
     return top_n
 
+
+def estimate_state_trans(top_n, labels,segment_starts,segment_ends):
+    """
+       n of the clusters are considered "states" for an HMM. This function 
+      estimates a state transition matrix for these clusters. The matrix is 
+      an nxn matrix of probabilities. The i-j element is the probability of the 
+      i-th element of top_n transitioning to the j-th element of top_n. """
+    
+    # Because the values in top_n correspond to clusters
+    # but values in trans_mat are from 1 to n. 
+    idx_map = {}
+    idx = 0
+    for i in top_n:
+        idx_map[i] = idx
+        idx+=1
+
+    trans_mat=np.zeros((len(top_n),len(top_n)))
+    prev_state = 0
+    for i in range(labels.shape[0]):
+        this_state = labels[i,0]
+        if (this_state in top_n) and (prev_state in top_n):
+            trans_mat[idx_map[prev_state],idx_map[this_state]] += 1.e5
+        if this_state in top_n:
+            T = time_to_sample(segment_ends[i,0]-segment_starts[i,0])
+            n_frames = sample_to_frames(T)
+            trans_mat[idx_map[this_state],idx_map[this_state]] += n_frames
+            prev_state = this_state
+    trans_mat = 1.*trans_mat
+    row_sum = trans_mat.sum(axis=1)
+    row_sum = row_sum.T
+    print trans_mat/row_sum.reshape(1,len(top_n))
+
 if __name__=='__main__':
     #fname='/Users/navidshokouhi/Downloads/unimaquarie/projects/ami_sample/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav'
     #fs,s = read_wav(fname)
@@ -124,5 +159,4 @@ if __name__=='__main__':
     top_clusters=top_n_clustesr(labels, segment_starts,segment_ends,n=4)
     for i in top_clusters:
         print i
-
-
+    estimate_state_trans(top_clusters, labels,segment_starts,segment_ends)

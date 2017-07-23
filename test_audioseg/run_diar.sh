@@ -74,4 +74,6 @@ done < ${out}/${fname}.models
 }
 TRAIN_GMMS
 
+# VITERBI
+sviterbi out_dir/hmm_trans.mdl out_dir/ES2002a.mfcc out_dir/hmm.mdl
 
