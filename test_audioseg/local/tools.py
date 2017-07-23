@@ -1,7 +1,8 @@
 # Script to interpret diarization results on a audio file. 
 import numpy as np
 from scipy.io import wavfile
-import pylab
+import sys
+#import pylab
 
 
 def add_wgn(s,var=1e-4):
@@ -39,9 +40,8 @@ def segs_to_stream(labels,segment_starts,segment_ends):
        Compress labels, their start times, and their end times 
        into a single numpy array. This is for plotting purposes.
         """
-    N = segment_ends[-1]
+    N = segment_ends[-1][0]
     stream = np.zeros((N,1))
-    print labels.shape
     for i in range(labels.shape[0]):
         stream[segment_starts[i,0]:segment_ends[i,0]] = labels[i]
     return stream
@@ -85,18 +85,44 @@ def read_segs(filename, fs=16000.0):
     segment_starts = list_to_array(segment_starts)
     segment_ends = list_to_array(segment_ends)
     label_stream = segs_to_stream(labels,segment_starts,segment_ends)
-    return label_stream
+    return label_stream, labels, segment_starts,segment_ends
+
+def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
+    """ 
+        Finds top n (typically 2) clusters in the segment file. 
+        By top n we mean the n clusters with most cummulative segment length."""
+    # Total number of clusters is largest cluster id +1 (to count silence)
+    cluster_durations = np.zeros((np.max(labels)+1,1))
+    for i in range(labels.shape[0]):
+        cluster_durations[labels[i,0],0] += segment_ends[i,0] - segment_starts[i,0]
+    # Multiply by -1, because argsort sorts in ascending order.
+    sorted_clusters = np.argsort(-1*cluster_durations,axis=0)
+    top_n = []
+    i = 0
+    while len(top_n) < n:
+        # This if statement is to exclude silence (i.e., label = 0)
+        if sorted_clusters[i,0]!=0:
+            top_n.append(sorted_clusters[i,0])
+        i += 1
+    return top_n
 
 if __name__=='__main__':
-    fname='/Users/navidshokouhi/Downloads/unimaquarie/projects/ami_sample/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav'
-    fs,s = read_wav(fname)
+    #fname='/Users/navidshokouhi/Downloads/unimaquarie/projects/ami_sample/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav'
+    #fs,s = read_wav(fname)
     fs = 16000.
-    segname='/Users/navidshokouhi/Software_dir/spkr_diarization/test_audioseg/out_dir/ES2002a.clusters'
-    labels = read_segs(segname,fs)
-    pylab.plot(s)
-    pylab.plot(labels/40.)
-    pylab.show()
+    #segname='/home/navid/spkr_diarization/test_audioseg/out_dir/ES2002a.clusters'
+    segname = sys.argv[1]
+    # 1. Plot labels
+    #labels,a,b,c = read_segs(segname,fs)
+    #pylab.plot(s)
+    #pylab.plot(labels/40.)
+    #pylab.show()
     #print len(labels)
-
+    
+    # 2. Find top clusters
+    a, labels, segment_starts,segment_ends = read_segs(segname,fs)
+    top_clusters=top_n_clustesr(labels, segment_starts,segment_ends,n=4)
+    for i in top_clusters:
+        print i
 
 
