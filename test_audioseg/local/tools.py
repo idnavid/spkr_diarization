@@ -2,7 +2,6 @@
 import numpy as np
 from scipy.io import wavfile
 import sys
-#import pylab
 
 
 def add_wgn(s,var=1e-4):
@@ -109,6 +108,32 @@ def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
         i += 1
     return top_n
 
+def print_hmm_trans(top_n,trans_mat):
+    n = len(top_n)
+    print n
+    for i in top_n:
+        print "C%s out_dir/C%s.mdl"%(str(i),str(i))
+    enter_probs = np.ones((1,n))*1.0
+    enter_probs = enter_probs/n
+    exit_probs = enter_probs
+    for i in range(n):
+        if i < n - 1:
+            print enter_probs[0,i],
+        else:
+            print enter_probs[0,i]
+    
+    for i in range(n):
+        for j in range(n):
+            if j < n-1:
+                print trans_mat[i,j],
+            else:
+                print trans_mat[i,j]
+    for i in range(n):
+        if i < n - 1:
+            print exit_probs[0,i],
+        else:
+            print exit_probs[0,i]
+
 
 def estimate_state_trans(top_n, labels,segment_starts,segment_ends):
     """
@@ -124,7 +149,6 @@ def estimate_state_trans(top_n, labels,segment_starts,segment_ends):
     for i in top_n:
         idx_map[i] = idx
         idx+=1
-
     trans_mat=np.zeros((len(top_n),len(top_n)))
     prev_state = 0
     for i in range(labels.shape[0]):
@@ -132,31 +156,40 @@ def estimate_state_trans(top_n, labels,segment_starts,segment_ends):
         if (this_state in top_n) and (prev_state in top_n):
             trans_mat[idx_map[prev_state],idx_map[this_state]] += 1#1.e5
         if this_state in top_n:
-            T = 1#time_to_sample(segment_ends[i,0]-segment_starts[i,0])
-            n_frames = sample_to_frames(T)
-            trans_mat[idx_map[this_state],idx_map[this_state]] += n_frames
+            #T = time_to_sample(segment_ends[i,0]-segment_starts[i,0])
+            #n_frames = 1#sample_to_frames(T)
+            #trans_mat[idx_map[this_state],idx_map[this_state]] += n_frames
             prev_state = this_state
     trans_mat = 1.*trans_mat
-    row_sum = trans_mat.sum(axis=1)
-    row_sum = row_sum.T
-    print trans_mat/row_sum.reshape(1,len(top_n))
+    row_sum = trans_mat.sum(axis=1).T
+    trans_mat = trans_mat/row_sum[:,np.newaxis]
+    print_hmm_trans(top_n,trans_mat)        
+
+    
+
+
+def plot_labels():
+    """
+    Plot labels
+    """
+    try:
+        import pylab
+    except:
+        print 'Plotting option not available.'
+        return 
+    labels,a,b,c = read_segs(segname,fs)
+    pylab.plot(s)
+    pylab.plot(labels/40.)
+    pylab.show()
+
 
 if __name__=='__main__':
     #fname='/Users/navidshokouhi/Downloads/unimaquarie/projects/ami_sample/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav'
     #fs,s = read_wav(fname)
     fs = 16000.
-    #segname='/home/navid/spkr_diarization/test_audioseg/out_dir/ES2002a.clusters'
     segname = sys.argv[1]
-    # 1. Plot labels
-    #labels,a,b,c = read_segs(segname,fs)
-    #pylab.plot(s)
-    #pylab.plot(labels/40.)
-    #pylab.show()
-    #print len(labels)
     
     # 2. Find top clusters
     a, labels, segment_starts,segment_ends = read_segs(segname,fs)
     top_clusters=top_n_clustesr(labels, segment_starts,segment_ends,n=4)
-    for i in top_clusters:
-        print i
     estimate_state_trans(top_clusters, labels,segment_starts,segment_ends)
