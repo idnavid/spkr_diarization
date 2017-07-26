@@ -64,8 +64,7 @@ def read_segs(filename, fs=16000.0):
         label start_time end_time
     """
     # For SAD segments, labels are limited ot sil and speech.
-    # Other segments, use different label values. 
-    # NOTE: will have to add conditions for cluster and bic segments. 
+    # Other segment types use different label values. 
     fin = open(filename)
     labels = []
     segment_starts = []
@@ -92,8 +91,9 @@ def read_segs(filename, fs=16000.0):
 
 def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
     """ 
-        Finds top n (typically 2) clusters in the segment file. 
-        By top n we mean the n clusters with most cummulative segment length."""
+    Finds top n (typically 2) clusters in the segment file. 
+    By top n we mean the n clusters with most cummulative segment length.
+    """
     # Total number of clusters is largest cluster id +1 (to count silence)
     cluster_durations = np.zeros((np.max(labels)+1,1))
     for i in range(labels.shape[0]):
@@ -112,11 +112,11 @@ def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
 
 def estimate_state_trans(top_n, labels,segment_starts,segment_ends):
     """
-       n of the clusters are considered "states" for an HMM. This function 
-      estimates a state transition matrix for these clusters. The matrix is 
-      an nxn matrix of probabilities. The i-j element is the probability of the 
-      i-th element of top_n transitioning to the j-th element of top_n. """
-    
+    n of the clusters are considered "states" for an HMM. This function 
+    estimates a state transition matrix for these clusters. The matrix is 
+    an nxn matrix of probabilities. The i-j element is the probability of the 
+    i-th element of top_n transitioning to the j-th element of top_n. 
+    """
     # Because the values in top_n correspond to clusters
     # but values in trans_mat are from 1 to n. 
     idx_map = {}
@@ -130,9 +130,9 @@ def estimate_state_trans(top_n, labels,segment_starts,segment_ends):
     for i in range(labels.shape[0]):
         this_state = labels[i,0]
         if (this_state in top_n) and (prev_state in top_n):
-            trans_mat[idx_map[prev_state],idx_map[this_state]] += 1.e5
+            trans_mat[idx_map[prev_state],idx_map[this_state]] += 1#1.e5
         if this_state in top_n:
-            T = time_to_sample(segment_ends[i,0]-segment_starts[i,0])
+            T = 1#time_to_sample(segment_ends[i,0]-segment_starts[i,0])
             n_frames = sample_to_frames(T)
             trans_mat[idx_map[this_state],idx_map[this_state]] += n_frames
             prev_state = this_state
