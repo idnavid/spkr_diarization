@@ -59,21 +59,21 @@ ls ${out}/ubm_*.mfcc > ${trn}/mfcc.list
 paste -d ' ' ${trn}/mfcc.list ${trn}/sad.list > ${trn}/mfcc_sad.list
 sgminit -q --label=speech --file-list=${trn}/mfcc_sad.list ${trn}/ubm.mdl
 }
-#TRAIN_UBM
+TRAIN_UBM
 
-TRAIN_GMMS(){
-# Find top N clusters. 
-python local/tools.py ${out}/${fname}.clusters | sed -e 's/^/C/' > ${out}/${fname}.models
-mfcc_file="${out}/${fname}.mfcc"
-seg_file="${out}/${fname}.clusters"
-echo "$mfcc_file $seg_file" > ${out}/adapt.script
-while IFS='' read -r C || [[ -n "$C" ]]; do
-   sgmestim --map=0.5 --update=wmv --label=${C} --output=${out}/${C}.mdl --file-list=${out}/adapt.script ${trn}/ubm.mdl
-   nfile=$((nfile + 1))
-done < ${out}/${fname}.models
-}
-TRAIN_GMMS
-
-# VITERBI
-sviterbi out_dir/hmm_trans.mdl out_dir/ES2002a.mfcc out_dir/hmm.mdl
-
+#TRAIN_GMMS(){
+## Find top N clusters. 
+#python local/tools.py ${out}/${fname}.clusters | sed -e 's/^/C/' > ${out}/${fname}.models
+#mfcc_file="${out}/${fname}.mfcc"
+#seg_file="${out}/${fname}.clusters"
+#echo "$mfcc_file $seg_file" > ${out}/adapt.script
+#while IFS='' read -r C || [[ -n "$C" ]]; do
+#   sgmestim --map=0.5 --update=wmv --label=${C} --output=${out}/${C}.mdl --file-list=${out}/adapt.script ${trn}/ubm.mdl
+#   nfile=$((nfile + 1))
+#done < ${out}/${fname}.models
+#}
+#TRAIN_GMMS
+#
+## VITERBI
+#sviterbi out_dir/hmm_trans.mdl out_dir/ES2002a.mfcc out_dir/hmm.mdl
+#

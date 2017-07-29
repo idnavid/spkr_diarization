@@ -2,7 +2,7 @@ import tools
 import sad
 import feat
 import sys
-
+import os
 
 def train(filelist,out='./out_dir/',model='UBM'):
     fin = open(filelist)
@@ -13,13 +13,13 @@ def train(filelist,out='./out_dir/',model='UBM'):
         basename = tools.gen_uid(wavname)
         # SAD
         sadname = '%s/%s_sad.txt'%(out,basename)
-        sad.run_sad(,sadname)
+        sad.run_sad(wavname,sadname)
         
         # MFCC
         featname = '%s/%s_feat.mfc'%(out,basename)
         feat.run_mfcc(wavname,featname)
 
-        fout.write(sadname+' '+featname)
+        fout.write(featname+' '+sadname+'\n')
     fin.close()
     fout.close()
     
@@ -27,6 +27,7 @@ def train(filelist,out='./out_dir/',model='UBM'):
     ubmname = '%s/%s'%(out,model)
     command = '%s/sgminit -q --label=speech --file-list=%s %s'
     exe_cmd = command%(path['audioseg'],ubm_list,ubmname)
+    os.system(exe_cmd)
     return ubmname
 
 
@@ -43,9 +44,10 @@ def adapt(featname,clustname,cluster,ubmname,out='./out_dir/'):
     params = 'wmv' # adapt these parameters, w:weights, m:means, v:vars
     gmmname = out+cluster
     exe_cmd=command%(path['audioseg'],gamma,params,cluster,gmmname,scriptname,ubmname)
+    os.system(exe_cmd)
     return gmmname
 
 
 if __name__=='__main__':
     ubmlist = sys.argv[1]
-    train(ubmlist,'./,UBM')
+    train(ubmlist)
