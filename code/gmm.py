@@ -9,10 +9,11 @@ def train(filelist,out='./out_dir/',model='UBM'):
     ubm_list = out+'ubm.lst'
     fout = open(ubm_list,'w')
     for i in fin:
-        basename = tools.gen_uid(i.strip())
+        wavname = i.strip()
+        basename = tools.gen_uid(wavname)
         # SAD
         sadname = '%s/%s_sad.txt'%(out,basename)
-        sad.run_sad(wavname,sadname)
+        sad.run_sad(,sadname)
         
         # MFCC
         featname = '%s/%s_feat.mfc'%(out,basename)
