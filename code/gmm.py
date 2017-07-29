@@ -1,6 +1,7 @@
 import tools
 import sad
 import feat
+import sys
 
 
 def train(filelist,out='./out_dir/',model='UBM'):
@@ -42,4 +43,8 @@ def adapt(featname,clustname,cluster,ubmname,out='./out_dir/'):
     gmmname = out+cluster
     exe_cmd=command%(path['audioseg'],gamma,params,,scriptname,ubmname)
     return gmmname
-        
+
+
+if __name__=='__main__':
+    ubmlist = sys.argv[1]
+    train(ubmlist,'./,UBM')

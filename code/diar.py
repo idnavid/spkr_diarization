@@ -33,7 +33,7 @@ if __name__=='__main__':
 #    top_n = tools.top_n_clustesr(labels, segment_starts,segment_ends)
 
     # TRAIN UBM
-    ubmname = gmm.train(filelist,out)
+    ubmname = gmm.train()
 #    for i in top_n:
 #        cluster = 'C%s'%(str(i))
 #        gmm.adapt(featname,clustname,cluster,ubmname)
