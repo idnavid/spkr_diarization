@@ -36,12 +36,12 @@ def adapt(featname,clustname,cluster,ubmname,out='./out_dir/'):
     fout.write(mfcc_and_segs)
     fout.close()
 
-    command='%s/sgmestim --map=%s --update=%s --label=%s --output=%s --file-list=%s %s %s'
+    command='%s/sgmestim --map=%s --update=%s --label=%s --output=%s --file-list=%s %s'
     path = tools.set_path()
     gamma = str(0.5) # adaptation coefficient
     params = 'wmv' # adapt these parameters, w:weights, m:means, v:vars
     gmmname = out+cluster
-    exe_cmd=command%(path['audioseg'],gamma,params,,scriptname,ubmname)
+    exe_cmd=command%(path['audioseg'],gamma,params,cluster,gmmname,scriptname,ubmname)
     return gmmname
 
 
