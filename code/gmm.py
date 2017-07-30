@@ -6,7 +6,7 @@ import os
 
 def train(filelist,out='./out_dir/',model='UBM'):
     fin = open(filelist)
-    ubm_list = out+'ubm.lst'
+    ubm_list = out+model
     fout = open(ubm_list,'w')
     for i in fin:
         wavname = i.strip()
