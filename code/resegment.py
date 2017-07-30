@@ -96,7 +96,7 @@ def state_transitions(cluster_dict,segname,hmmname):
 
 
 
-def viterbi(featname,cluster_dict,hmmname):
+def viterbi(featname,cluster_dict,segname,hmmname,viterbiname):
     state_transitions(cluster_dict,segname,hmmname)
     path = tools.set_path()
     command = '%s/sviterbi %s %s %s'
@@ -131,7 +131,7 @@ if __name__=='__main__':
         cluster_dict[cluster] = gmmname
 
     state_transitions(cluster_dict,clustname,hmmname)
-
+    
 
 
 

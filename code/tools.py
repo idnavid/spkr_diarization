@@ -16,13 +16,13 @@ def prepare_root(root_dir):
 def read_input():
     wavname = sys.argv[1]
     ubmname = sys.argv[2]
-    return wavname
+    return wavname,ubmname
 
 def set_path():
-    #spro_path='/Users/navidshokouhi/Software_dir/audioseg_dir/spro-5.0/'
-    spro_path='/home/navid/tools/spro-4.0/'
-    #audioseg_path ='/Users/navidshokouhi/Software_dir/audioseg_dir/audioseg-1.1/src/'
-    audioseg_path='/home/navid/tools/audioseg-1.1/src/'
+    spro_path='/Users/navidshokouhi/Software_dir/audioseg_dir/spro-5.0/'
+    #spro_path='/home/navid/tools/spro-4.0/'
+    audioseg_path ='/Users/navidshokouhi/Software_dir/audioseg_dir/audioseg-1.1/src/'
+    #audioseg_path='/home/navid/tools/audioseg-1.1/src/'
     return {'spro':spro_path,'audioseg':audioseg_path}
 
 def gen_uid(wavname):
@@ -43,7 +43,8 @@ def time_to_sample(time_stamp,fs=16000.):
 def list_to_array(in_list):
     """
         Convert 1D list of numeric values to np array.
-        Added this because I had to use it several times. """
+        Added this because I had to use it several times. 
+    """
     out_array = np.array(in_list)
     return out_array.reshape((len(in_list),1))
 
@@ -66,7 +67,7 @@ def read_segs(segname, fs=16000.0):
         Uses the segment file format defined by AudioSeg.
         lines contain three fields:
         label start_time end_time
-        """
+    """
     # For SAD segments, labels are limited ot sil and speech.
     # Other segment types use different label values.
     fin = open(segname)

@@ -4,6 +4,7 @@ import feat
 import cluster
 import bic
 import gmm
+import resegment
 
 if __name__=='__main__':
     root_dir = './'
@@ -41,4 +42,7 @@ if __name__=='__main__':
         gmmname = gmm.adapt(featname,clustname,cluster,ubmname)
         cluster_gmms[cluster] = gmmname
 
-    
+    # Resegmentation
+    hmmname = '%s/%s_hmm.txt'%(out,basename)
+    viterbiname = '%s/%s_viterbi.txt'%(out,basename)
+    resegment.viterbi(featname,cluster_gmms,clustname,hmmname,viterbiname)
