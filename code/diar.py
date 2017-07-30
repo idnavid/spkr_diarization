@@ -36,6 +36,12 @@ if __name__=='__main__':
     # TRAIN UBM
     ubmlist='/home/navid/spkr_diarization/test_audioseg/train/ubm.list'
     ubmname=gmm.train(ubmlist)
+    
+    # Adapt clusters
+    cluster_gmms = {}
     for i in top_n:
         cluster = 'C%s'%(str(i))
-        gmm.adapt(featname,clustname,cluster,ubmname)
+        gmmname = gmm.adapt(featname,clustname,cluster,ubmname)
+        cluster_gmms[cluster] = gmmname
+
+    

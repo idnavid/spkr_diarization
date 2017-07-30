@@ -18,10 +18,10 @@ def read_input():
     return wavname
 
 def set_path():
-    #spro_path='/Users/navidshokouhi/Software_dir/audioseg_dir/spro-5.0/'
-    spro_path='/home/navid/tools/spro-4.0/'
-    #audioseg_path ='/Users/navidshokouhi/Software_dir/audioseg_dir/audioseg-1.1/src/'
-    audioseg_path='/home/navid/tools/audioseg-1.1/src/'
+    spro_path='/Users/navidshokouhi/Software_dir/audioseg_dir/spro-5.0/'
+#    spro_path='/home/navid/tools/spro-4.0/'
+    audioseg_path ='/Users/navidshokouhi/Software_dir/audioseg_dir/audioseg-1.1/src/'
+#    audioseg_path='/home/navid/tools/audioseg-1.1/src/'
     return {'spro':spro_path,'audioseg':audioseg_path}
 
 def gen_uid(wavname):
