@@ -15,6 +15,7 @@ def prepare_root(root_dir):
 
 def read_input():
     wavname = sys.argv[1]
+    ubmname = sys.argv[2]
     return wavname
 
 def set_path():

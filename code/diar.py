@@ -8,7 +8,7 @@ import gmm
 if __name__=='__main__':
     root_dir = './'
     out=tools.prepare_root(root_dir)
-    wavname = tools.read_input()
+    wavname,ubmname = tools.read_input()
     basename = tools.gen_uid(wavname)
     
     # SAD
@@ -31,13 +31,10 @@ if __name__=='__main__':
     
     # Pick top clusters
     labels, segment_starts,segment_ends = tools.read_segs(clustname)
-    top_n = tools.top_n_clustesr(labels, segment_starts,segment_ends)
+    top_n = tools.top_n_clustesr(labels, segment_starts,segment_ends,n=4)
 
-    # TRAIN UBM
-    ubmlist='/home/navid/spkr_diarization/test_audioseg/train/ubm.list'
-    ubmname=gmm.train(ubmlist)
-    
-    # Adapt clusters
+
+    # Adapt UBM for each cluster.
     cluster_gmms = {}
     for i in top_n:
         cluster = 'C%s'%(str(i))
