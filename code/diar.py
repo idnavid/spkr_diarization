@@ -6,7 +6,8 @@ import bic
 import gmm
 import resegment
 
-def diarization(root_dir,wavname,ubmname,out_dir):
+def diarization(wavname,ubmname,out_dir):
+    out = out_dir+'/'
     basename = tools.gen_uid(wavname)
     sadname = '%s/%s_sad.txt'%(out,basename)
     featname = '%s/%s_feat.mfc'%(out,basename)
