@@ -41,6 +41,11 @@ def time_to_sample(time_stamp,fs=16000.):
         Convert time value in seconds to sample. """
     return 1 + int(time_stamp*fs)
 
+def sample_to_time(sample,fs=16000.):
+    """
+        Convert time value in seconds to sample. """
+    return sample/fs
+
 def list_to_array(in_list):
     """
         Convert 1D list of numeric values to np array.
@@ -61,6 +66,14 @@ def rm_empties(in_list):
             out_list.append(i)
     return out_list
 
+def write_segs(labels,segment_starts,segment_ends,segname):
+    N = labels.shape[0]
+    fout = open(segname,'w')
+    line = '%s %.2f %.2f\n'
+    for i in range(N):
+        seg = line%(str(int(labels[i,0])),(segment_starts[i,0]),(segment_ends[i,0]))
+        fout.write(seg)
+    fout.close()
 
 def read_segs(segname, fs=16000.0):
     """
@@ -94,8 +107,45 @@ def read_segs(segname, fs=16000.0):
     segment_ends = list_to_array(segment_ends)
     return labels, segment_starts,segment_ends
 
+
+def segs_to_stream(labels,segment_starts,segment_ends):
+    """
+    Compress labels, their start times, and their end times
+    into a single numpy array. This is for plotting purposes.
+    """
+    N = segment_ends[-1][0]
+    stream = np.zeros((N,1))
+    for i in range(labels.shape[0]):
+        stream[segment_starts[i,0]:segment_ends[i,0]] = labels[i]
+    return stream
+
+
+def merge_segs(segname1,segname2):
+    labels1, segment_starts1,segment_ends1 = read_segs(segname1)
+    label_stream1 = segs_to_stream(labels1,segment_starts1,segment_ends1)
+    labels2, segment_starts2,segment_ends2 = read_segs(segname2)
+    label_stream2 = segs_to_stream(labels2,segment_starts2,segment_ends2)
+
+    label_stream1 = np.multiply(label_stream2,label_stream1)
+    breaks = np.diff(label_stream1,axis=0)
+    labels = []
+    segment_starts = []
+    segment_ends = []
+    start = 0.
+    for i in range(1,breaks.shape[0]):
+        if breaks[i,0] != 0:
+            end = sample_to_time(i)
+            labels.append(label_stream1[i-1,0])
+            segment_starts.append(start)
+            segment_ends.append(end)
+            start = sample_to_time(i+1)
+    return list_to_array(labels),list_to_array(segment_starts),list_to_array(segment_ends)
+
+
+
+
 # Clustering functions
-def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
+def top_n_clusters(labels, segment_starts,segment_ends,n=2):
     """
         Finds top n (typically 2) clusters in the segment file.
         By top n we mean the n clusters with most cummulative segment length.
@@ -114,3 +164,6 @@ def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
             top_n.append(sorted_clusters[i,0])
         i += 1
     return top_n
+
+
+

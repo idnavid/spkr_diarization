@@ -72,26 +72,29 @@ def state_transitions(cluster_dict,segname,hmmname):
     trans_mat=np.zeros((n,n))
     labels, segment_starts,segment_ends = tools.read_segs(segname)
     # First estimate diagonal elements.
-    prev_state = 0
-    for i in range(labels.shape[0]):
-        this_state = labels[i,0]
-        if (this_state in cluster_ids) and (prev_state == this_state):
-            trans_mat[idx_map[this_state],idx_map[this_state]] += 1.
-        if this_state in cluster_ids:
-            prev_state = this_state
-    N = trans_mat.sum()
-    trans_mat = trans_mat/float(N)
-    print trans_mat
+    #    prev_state = 0
+    #    for i in range(labels.shape[0]):
+    #        this_state = labels[i,0]
+    #        if (this_state in cluster_ids) and (prev_state == this_state):
+    #            trans_mat[idx_map[this_state],idx_map[this_state]] += 1.
+    #        if this_state in cluster_ids:
+    #            prev_state = this_state
+    #    N = trans_mat.sum()
+    #    trans_mat = trans_mat/float(N)
+
+    for i in range(n):
+        trans_mat[i,i] = (70. - 20.*i)/100.
     # Estimate off-diagonal elements using
     # equation (5) from Meignier et al. 2017, "Step-by-step and
     # integrated approaches in broadcast news speakerdiarization".
-    for i in range(trans_mat.shape[0]):
+    for i in range(n):
         pii = trans_mat[i,i]
         pij = (1 - pii)/(n-1)
-        for j in range(trans_mat.shape[1]):
+        for j in range(n):
             if i!=j:
                 trans_mat[i,j] = pij
     print_hmm_trans(cluster_dict,trans_mat,hmmname)
+    print trans_mat
     return
 
 
@@ -131,7 +134,7 @@ if __name__=='__main__':
     
     # Pick top clusters
     labels, segment_starts,segment_ends = tools.read_segs(clustname)
-    top_n = tools.top_n_clustesr(labels, segment_starts,segment_ends)
+    top_n = tools.top_n_clusters(labels, segment_starts,segment_ends)
     
     cluster_dict = {}
     for i in top_n:
