@@ -11,38 +11,43 @@ if __name__=='__main__':
     out=tools.prepare_root(root_dir)
     wavname,ubmname = tools.read_input()
     basename = tools.gen_uid(wavname)
-    
-    # SAD
     sadname = '%s/%s_sad.txt'%(out,basename)
-    sad.run_sad(wavname,sadname)
-    
-    
-    # MFCC
     featname = '%s/%s_feat.mfc'%(out,basename)
-    feat.run_mfcc(wavname,featname)
+    bicname = '%s/%s_bic.txt'%(out,basename)
+    clustname = '%s/%s_cluster.txt'%(out,basename)
+    viterbiname = '%s/%s_viterbi.txt'%(out,basename)
+    attr = {'audio':wavname,
+             'mfcc':featname,
+             'sad':sadname,
+             'bic':bicname,
+             'cluster':clustname,
+             'viterbi':viterbiname}
+
+    # SAD
+    sad.run_sad(attr)
+
+    # MFCC
+    feat.run_mfcc(attr)
     
     # BIC
-    bicname = '%s/%s_bic.txt'%(out,basename)
-    bic.run_bic(featname,sadname,bicname)
+    bic.run_bic(attr)
     
     # CLUSTERING
-    clustname = '%s/%s_cluster.txt'%(out,basename)
-    cluster.run_clustering(featname,bicname,clustname)
+    cluster.run_clustering(attr)
 
     
     # Pick top clusters
-    labels, segment_starts,segment_ends = tools.read_segs(clustname)
-    top_n = tools.top_n_clustesr(labels, segment_starts,segment_ends,n=4)
+    labels, segment_starts,segment_ends = tools.read_segs(attr['cluster'])
+    top_n = tools.top_n_clustesr(labels, segment_starts,segment_ends,n=2)
 
 
     # Adapt UBM for each cluster.
     cluster_gmms = {}
     for i in top_n:
         cluster = 'C%s'%(str(i))
-        gmmname = gmm.adapt(featname,clustname,cluster,ubmname)
+        gmmname = gmm.adapt(attr,cluster,ubmname)
         cluster_gmms[cluster] = gmmname
 
     # Resegmentation
     hmmname = '%s/%s_hmm.txt'%(out,basename)
-    viterbiname = '%s/%s_viterbi.txt'%(out,basename)
-    resegment.viterbi(featname,cluster_gmms,clustname,hmmname,viterbiname)
+    resegment.viterbi(attr,cluster_gmms,hmmname)

@@ -35,6 +35,7 @@ def gen_uid(wavname):
     return basename
 
 
+# Reading Segments
 def time_to_sample(time_stamp,fs=16000.):
     """
         Convert time value in seconds to sample. """
@@ -93,6 +94,7 @@ def read_segs(segname, fs=16000.0):
     segment_ends = list_to_array(segment_ends)
     return labels, segment_starts,segment_ends
 
+# Clustering functions
 def top_n_clustesr(labels, segment_starts,segment_ends,n=2):
     """
         Finds top n (typically 2) clusters in the segment file.

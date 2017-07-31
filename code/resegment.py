@@ -96,7 +96,10 @@ def state_transitions(cluster_dict,segname,hmmname):
 
 
 
-def viterbi(featname,cluster_dict,segname,hmmname,viterbiname):
+def viterbi(attr,cluster_dict,hmmname):
+    featname = attr['mfcc']
+    viterbiname = attr['viterbi']
+    segname = attr['cluster']
     state_transitions(cluster_dict,segname,hmmname)
     path = tools.set_path()
     command = '%s/sviterbi %s %s %s'
@@ -115,10 +118,16 @@ if __name__=='__main__':
     clustname = './%s_cluster.txt'%(basename)
     hmmname = './%s_hmm.mdl'%(basename)
     
-    sad.run_sad(wavname,sadname)
-    feat.run_mfcc(wavname,featname)
-    bic.run_bic(featname,sadname,bicname)
-    cluster.run_clustering(featname,bicname,clustname)
+    attr = {'audio':wavname,
+        'mfcc':featname,
+        'sad':sadname,
+        'bic':bicname,
+        'cluster':clustname}
+
+    sad.run_sad(attr)
+    feat.run_mfcc(attr)
+    bic.run_bic(attr)
+    cluster.run_clustering(attr)
     
     # Pick top clusters
     labels, segment_starts,segment_ends = tools.read_segs(clustname)

@@ -31,7 +31,9 @@ def train(filelist,out='./out_dir/',model='UBM'):
     return ubmname
 
 
-def adapt(featname,clustname,cluster,ubmname,out='./out_dir/'):
+def adapt(attr,cluster,ubmname,out='./out_dir/'):
+    featname = attr['mfcc']
+    clustname = attr['cluster']
     mfcc_and_segs = featname+' '+clustname
     scriptname = out+'adapt.script'
     fout = open(scriptname,'w')

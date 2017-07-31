@@ -3,8 +3,11 @@ import tools
 import sad
 import feat
 
-def run_bic(featname,sadname,bicname):
+def run_bic(attr):
     path = tools.set_path()
+    sadname = attr['sad']
+    featname = attr['mfcc']
+    bicname = attr['bic']
     command = '%s/sbic --segmentation=%s --label=speech %s %s'
     exe_cmd = command%(path['audioseg'],sadname,featname,bicname)
     os.system(exe_cmd)
@@ -17,8 +20,11 @@ if __name__=='__main__':
     sadname = './%s_sad.txt'%(basename)
     featname = './%s.mfc'%(basename)
     bicname = './%s_bic.txt'%(basename)
-
-    sad.run_sad(wavname,sadname)
-    feat.run_mfcc(wavname,featname)
-    run_bic(featname,sadname,bicname)
+    attr = {'audio':wavname,
+            'sad':sadname,
+            'mfcc':featname,
+            'bic':bicname}
+    sad.run_sad(attr)
+    feat.run_mfcc(attr)
+    run_bic(attr)
     
