@@ -4,22 +4,23 @@ import feat
 import sys
 import os
 
-def train(filelist,out='./out_dir/',model='UBM'):
+def train(filelist,out='./out_dir/',model='UBM_0'):
     fin = open(filelist)
     ubm_list = out+model
     fout = open(ubm_list,'w')
     for i in fin:
         wavname = i.strip()
         basename = tools.gen_uid(wavname)
-        # SAD
+        featname = '%s/%s_feat.mfc'%(out,basename)
         sadname = '%s/%s_sad.txt'%(out,basename)
-        sad.run_sad(wavname,sadname)
+        attr = {'mfcc':featname,'sad':sadname}
+        # SAD
+        sad.run_sad(attr)
         
         # MFCC
-        featname = '%s/%s_feat.mfc'%(out,basename)
-        feat.run_mfcc(wavname,featname)
+        feat.run_mfcc(attr)
 
-        fout.write(featname+' '+sadname+'\n')
+        fout.write(attr['mfcc']+' '+attr['sad']+'\n')
     fin.close()
     fout.close()
     
