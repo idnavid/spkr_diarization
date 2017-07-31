@@ -23,3 +23,12 @@ cd audioseg-directory
 ./configure --with-spro=[path-to-spro-directory]
 make
 make install
+
+Running code in python: 
+main module is diar.py. 
+diar.py contains example script. To load in python, use diar.diarization(root_dir,wavname,ubmname,out_dir), 
+where:
+root_dir: root directory of experiment. 
+wavname: full path to wave file on disk. 
+ubmname: full path to pretrained UBM on disk. 
+out_dir: output directory, to store intermediate files. 
