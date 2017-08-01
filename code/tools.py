@@ -119,7 +119,7 @@ def segs_to_stream(labels,segment_starts,segment_ends):
     N = segment_ends[-1][0]
     stream = np.zeros((N,1))
     for i in range(labels.shape[0]):
-        stream[segment_starts[i,0]:segment_ends[i,0]] = labels[i]
+        stream[segment_starts[i,0]:segment_ends[i,0],0] = labels[i][0]
     return stream
 
 
@@ -146,6 +146,30 @@ def merge_segs(segname1,segname2):
 
 
 
+def read_annotations(filename):
+    """
+    Reads dolby annotations. 
+    segment start/ends are originally in 10ms frames. 
+    *dt in the transcription indicates secondary speaker.
+    """
+    fin = open(filename)
+    labels = []
+    segment_starts = []
+    segment_ends = []
+    for i in fin:
+        line_list = i.strip().split('\t')
+        line_fields = rm_empties(line_list)
+        if '*dt' in line_fields[3]:
+            labels.append(2)
+        else:
+            labels.append(1)
+        segment_starts.append(time_to_sample(int(line_fields[0])*0.01))
+        segment_ends.append(time_to_sample(int(line_fields[1])*0.01))
+    labels = list_to_array(labels)
+    segment_starts = list_to_array(segment_starts)
+    segment_ends = list_to_array(segment_ends)
+    return labels,segment_starts,segment_ends
+
 
 # Clustering functions
 def top_n_clusters(labels, segment_starts,segment_ends,n=2):
@@ -170,3 +194,14 @@ def top_n_clusters(labels, segment_starts,segment_ends,n=2):
 
 
 
+if __name__=='__main__':
+    filename = '/Users/navidshokouhi/Downloads/unimaquarie/projects/dolby-annotations/out/1_222_2_7_001-ch6-speaker16.out'
+    labels, seg_starts, seg_ends = read_annotations(filename)
+    stream = segs_to_stream(labels,seg_starts,seg_ends)
+    import pylab
+    pylab.plot(stream)
+    filename = 'out_dir/final_diar.txt'
+    labels, seg_starts, seg_ends = read_segs(filename)
+    stream= segs_to_stream(labels,seg_starts,seg_ends)
+    pylab.plot(stream)
+    pylab.show()
