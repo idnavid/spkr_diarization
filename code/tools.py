@@ -19,10 +19,10 @@ def read_input():
     return wavname,ubmname
 
 def set_path():
-    #spro_path='/Users/navidshokouhi/Software_dir/audioseg_dir/spro-5.0/'
-    spro_path='/home/navid/tools/spro-4.0/'
-    #audioseg_path ='/Users/navidshokouhi/Software_dir/audioseg_dir/audioseg-1.1/src/'
-    audioseg_path='/home/navid/tools/audioseg-1.1/src/'
+    spro_path='/Users/navidshokouhi/Software_dir/audioseg_dir/spro-5.0/'
+    #spro_path='/home/navid/tools/spro-4.0/'
+    audioseg_path ='/Users/navidshokouhi/Software_dir/audioseg_dir/audioseg-1.1/src/'
+    #audioseg_path='/home/navid/tools/audioseg-1.1/src/'
     return {'spro':spro_path,'audioseg':audioseg_path}
 
 def gen_uid(wavname):
@@ -99,6 +99,9 @@ def read_segs(segname, fs=16000.0):
         elif 'C' in line_list[0]:
             # For when reading cluster labels CX
             labels.append(int(line_list[0][1:]))
+        else:
+            # Assumes labels are digits
+            labels.append(int(line_list[0]))
         segment_starts.append(time_to_sample(float(line_list[1].strip()),fs))
         segment_ends.append(time_to_sample(float(line_list[2].strip()),fs))
     fin.close()
