@@ -13,7 +13,7 @@ def train(filelist,out='./out_dir/',model='UBM_0'):
         basename = tools.gen_uid(wavname)
         featname = '%s/%s_feat.mfc'%(out,basename)
         sadname = '%s/%s_sad.txt'%(out,basename)
-        attr = {'mfcc':featname,'sad':sadname}
+        attr = {'audio':wavname,'mfcc':featname,'sad':sadname}
         # SAD
         sad.run_sad(attr)
         
