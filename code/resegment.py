@@ -83,7 +83,7 @@ def state_transitions(cluster_dict,segname,hmmname):
     #    trans_mat = trans_mat/float(N)
 
     for i in range(n):
-        trans_mat[i,i] = (70. - 20.*i)/100.
+        trans_mat[i,i] = (50. + 0.*i)/100.
     # Estimate off-diagonal elements using
     # equation (5) from Meignier et al. 2017, "Step-by-step and
     # integrated approaches in broadcast news speakerdiarization".
