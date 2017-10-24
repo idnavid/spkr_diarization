@@ -39,3 +39,6 @@ where:
   ubmname: full path to pretrained UBM on disk. 
   out_dir: output directory, to store intermediate files. 
 ```
+
+## Examples: 
+A working example for for Austalk data is available in `experiments`. 
