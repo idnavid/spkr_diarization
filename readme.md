@@ -6,7 +6,7 @@ Navid Shokouhi
 July 2017
 
 
-## Requirements: 
+## Packages: 
 Spro (for feature extraction)
 AudioSeg (Diarization binaries)
 
