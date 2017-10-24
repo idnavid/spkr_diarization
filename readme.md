@@ -31,8 +31,7 @@ NOTE: when installing on Mac, use Spro 5.0
   ```
 
 ## diar.py
-main module is diar.py. 
-diar.py contains example script. To load in python, use diar.diarization(root_dir,wavname,ubmname,out_dir), 
+main module is diar.py, which contains an example script. To load in python, use diar.diarization(root_dir,wavname,ubmname,out_dir), 
 where:
 ```
   root_dir: root directory of experiment. 

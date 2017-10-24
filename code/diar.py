@@ -58,18 +58,9 @@ if __name__=='__main__':
     out=tools.prepare_root(root_dir)
     wavname,ubmname = tools.read_input()
     basename = tools.gen_uid(wavname)
-    sadname = '%s/%s_sad.txt'%(out,basename)
-    featname = '%s/%s_feat.mfc'%(out,basename)
-    bicname = '%s/%s_bic.txt'%(out,basename)
-    clustname = '%s/%s_cluster.txt'%(out,basename)
-    viterbiname = '%s/%s_viterbi.txt'%(out,basename)
-    attr = {'audio':wavname,
-             'mfcc':featname,
-             'sad':sadname,
-             'bic':bicname,
-             'cluster':clustname,
-             'viterbi':viterbiname}
-
+    attr = tools.gen_attr(out,basename,wavname)
+    
+    
     # SAD
     sad.run_sad(attr)
 
@@ -84,7 +75,8 @@ if __name__=='__main__':
 
     # Pick top clusters
     labels, segment_starts,segment_ends = tools.read_segs(attr['cluster'])
-    top_n = tools.top_n_clusters(labels, segment_starts,segment_ends,n=2)
+    n_spkrs = 4
+    top_n = tools.top_n_clusters(labels, segment_starts,segment_ends,n_spkrs)
 
 
     # Adapt UBM for each cluster.
@@ -93,9 +85,9 @@ if __name__=='__main__':
         cluster = 'C%s'%(str(i))
         gmmname = gmm.adapt(attr,cluster,ubmname)
         cluster_gmms[cluster] = gmmname
-
+    
     # Resegmentation
     hmmname = '%s/%s_hmm.txt'%(out,basename)
     resegment.viterbi(attr,cluster_gmms,hmmname)
-    labs,starts,ends = tools.merge_segs(attr['viterbi'],attr['sad'])
+
     tools.write_segs(labs,starts,ends,out+'final_diar.txt')

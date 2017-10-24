@@ -11,7 +11,8 @@ def prepare_root(root_dir):
     Prepares directory to store intermediate
     files onto disk.
     """
-    out='%s/out_dir/'%(root_dir)
+    rand_extention = str(uuid.uuid4().fields[-1])[:5]
+    out='%s/out_%s/'%(root_dir,rand_extention)
     command = 'mkdir -p %s'
     exe_cmd = command%(out)
     os.system(exe_cmd)
@@ -22,9 +23,11 @@ def read_input():
     """
     Parses command line input. 
     This isn't a great way to write this, but
-    it makes the main script look cleaner. 
+    it makes the main script look clean.
     """
     wavname = sys.argv[1]
+    if wavname[-4:]!='.wav':
+        raise ValueError('incorrect input wave format!')
     ubmname = sys.argv[2]
     return wavname,ubmname
 
@@ -52,6 +55,29 @@ def gen_uid(wavname):
     return basename
 
 
+#---------------------------------
+def gen_attr(out,basename,wavname):
+    """
+    Generate an attribute dictionary that contains
+    the file names corresponding to all components: 
+        sad
+        features
+        bic
+        cluster
+        viterbi
+    """
+    sadname = '%s/%s_sad.txt'%(out,basename)
+    featname = '%s/%s_feat.mfc'%(out,basename)
+    bicname = '%s/%s_bic.txt'%(out,basename)
+    clustname = '%s/%s_cluster.txt'%(out,basename)
+    viterbiname = '%s/%s_viterbi.txt'%(out,basename)
+    attr = {'audio':wavname,
+            'mfcc':featname,
+            'sad':sadname,
+            'bic':bicname,
+            'cluster':clustname,
+            'viterbi':viterbiname}
+    return attr
 
 # Reading Segments
 #---------------------------------
@@ -155,27 +181,13 @@ def segs_to_stream(labels,segment_starts,segment_ends):
     return stream
 
 #---------------------------------
-def merge_segs(segname1,segname2):
-    labels1, segment_starts1,segment_ends1 = read_segs(segname1)
-    label_stream1 = segs_to_stream(labels1,segment_starts1,segment_ends1)
-    labels2, segment_starts2,segment_ends2 = read_segs(segname2)
-    label_stream2 = segs_to_stream(labels2,segment_starts2,segment_ends2)
-
-    label_stream1 = np.multiply(label_stream2,label_stream1)
-    breaks = np.diff(label_stream1,axis=0)
-    labels = []
-    segment_starts = []
-    segment_ends = []
-    start = 0.
-    for i in range(1,breaks.shape[0]):
-        if breaks[i,0] != 0:
-            end = sample_to_time(i)
-            labels.append(label_stream1[i-1,0])
-            segment_starts.append(start)
-            segment_ends.append(end)
-            start = sample_to_time(i+1)
-    return list_to_array(labels),list_to_array(segment_starts),list_to_array(segment_ends)
-
+def merge_segs(segname,sadname):
+    """
+        Merge speaker labels from segname with 
+        sad labels. This function zeros out the segments 
+        that have previously been labeled as silence.
+    """
+    return
 
 #---------------------------------
 def read_annotations(filename):
