@@ -5,26 +5,43 @@ import numpy as np
 
 
 # DISK I/O functions
+#---------------------------------
 def prepare_root(root_dir):
+    """
+    Prepares directory to store intermediate
+    files onto disk.
+    """
     out='%s/out_dir/'%(root_dir)
     command = 'mkdir -p %s'
     exe_cmd = command%(out)
     os.system(exe_cmd)
     return out
 
-
+#---------------------------------
 def read_input():
+    """
+    Parses command line input. 
+    This isn't a great way to write this, but
+    it makes the main script look cleaner. 
+    """
     wavname = sys.argv[1]
     ubmname = sys.argv[2]
     return wavname,ubmname
 
+#---------------------------------
 def set_path():
+    """
+    specifies location of extra tools. 
+    NOTE: This isn't a great way to write this, but it's
+    useful because it summarizes all external packages here. 
+    """
     spro_path='/Users/navidshokouhi/Software_dir/audioseg_dir/spro-5.0/'
     #spro_path='/home/navid/tools/spro-4.0/'
     audioseg_path ='/Users/navidshokouhi/Software_dir/audioseg_dir/audioseg-1.1/src/'
     #audioseg_path='/home/navid/tools/audioseg-1.1/src/'
     return {'spro':spro_path,'audioseg':audioseg_path}
 
+#---------------------------------
 def gen_uid(wavname):
     """
     Generate unique id based on input wavname.
@@ -35,17 +52,22 @@ def gen_uid(wavname):
     return basename
 
 
+
 # Reading Segments
+#---------------------------------
 def time_to_sample(time_stamp,fs=16000.):
     """
         Convert time value in seconds to sample. """
     return 1 + int(time_stamp*fs)
 
+
+#---------------------------------
 def sample_to_time(sample,fs=16000.):
     """
         Convert time value in seconds to sample. """
     return sample/fs
 
+#---------------------------------
 def list_to_array(in_list):
     """
         Convert 1D list of numeric values to np array.
@@ -54,6 +76,7 @@ def list_to_array(in_list):
     out_array = np.array(in_list)
     return out_array.reshape((len(in_list),1))
 
+#---------------------------------
 def rm_empties(in_list):
     """
     remove empty characters from list. 
@@ -66,15 +89,24 @@ def rm_empties(in_list):
             out_list.append(i)
     return out_list
 
-def write_segs(labels,segment_starts,segment_ends,segname):
+#---------------------------------
+def write_segs(labels,segment_starts,segment_ends,segname,fs=16000.,mode=''):
+    print mode
     N = labels.shape[0]
     fout = open(segname,'w')
     line = '%s %.2f %.2f\n'
     for i in range(N):
-        seg = line%(str(int(labels[i,0])),(segment_starts[i,0]),(segment_ends[i,0]))
+        if labels[i,0] == 0:
+            lab = 'sil'
+        else:
+            lab = str(int(labels[i,0]))
+            if mode=='uniform':
+                lab = 'unk'
+        seg = line%(lab,(segment_starts[i,0]/fs),(segment_ends[i,0]/fs))
         fout.write(seg)
     fout.close()
 
+#---------------------------------
 def read_segs(segname, fs=16000.0):
     """
         read segment file.
@@ -110,7 +142,7 @@ def read_segs(segname, fs=16000.0):
     segment_ends = list_to_array(segment_ends)
     return labels, segment_starts,segment_ends
 
-
+#---------------------------------
 def segs_to_stream(labels,segment_starts,segment_ends):
     """
     Compress labels, their start times, and their end times
@@ -122,7 +154,7 @@ def segs_to_stream(labels,segment_starts,segment_ends):
         stream[segment_starts[i,0]:segment_ends[i,0],0] = labels[i][0]
     return stream
 
-
+#---------------------------------
 def merge_segs(segname1,segname2):
     labels1, segment_starts1,segment_ends1 = read_segs(segname1)
     label_stream1 = segs_to_stream(labels1,segment_starts1,segment_ends1)
@@ -145,7 +177,7 @@ def merge_segs(segname1,segname2):
     return list_to_array(labels),list_to_array(segment_starts),list_to_array(segment_ends)
 
 
-
+#---------------------------------
 def read_annotations(filename):
     """
     Reads dolby annotations. 
@@ -172,6 +204,7 @@ def read_annotations(filename):
 
 
 # Clustering functions
+#---------------------------------
 def top_n_clusters(labels, segment_starts,segment_ends,n=2):
     """
         Finds top n (typically 2) clusters in the segment file.
@@ -200,7 +233,7 @@ if __name__=='__main__':
     stream = segs_to_stream(labels,seg_starts,seg_ends)
     import pylab
     pylab.plot(stream)
-    filename = 'out_dir/final_diar.txt'
+    filename = 'out_dir/1_222_2_7_001-ch6-speaker16_18474_cluster.txt'
     labels, seg_starts, seg_ends = read_segs(filename)
     stream= segs_to_stream(labels,seg_starts,seg_ends)
     pylab.plot(stream)

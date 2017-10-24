@@ -94,7 +94,7 @@ def state_transitions(cluster_dict,segname,hmmname):
             if i!=j:
                 trans_mat[i,j] = pij
     print_hmm_trans(cluster_dict,trans_mat,hmmname)
-    print trans_mat
+    #print trans_mat
     return
 
 

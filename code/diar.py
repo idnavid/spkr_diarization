@@ -28,7 +28,7 @@ def diarization(wavname,ubmname,out_dir):
     feat.run_mfcc(attr)
     
     # BIC
-    bic.run_bic(attr)
+    bic.run_bic(attr,'audioseg')
     
     # CLUSTERING
     cluster.run_clustering(attr)
@@ -75,14 +75,13 @@ if __name__=='__main__':
 
     # MFCC
     feat.run_mfcc(attr)
-    
+
     # BIC
-    bic.run_bic(attr)
-    
+    bic.run_bic(attr,'uniform')
+
     # CLUSTERING
     cluster.run_clustering(attr)
 
-    
     # Pick top clusters
     labels, segment_starts,segment_ends = tools.read_segs(attr['cluster'])
     top_n = tools.top_n_clusters(labels, segment_starts,segment_ends,n=2)
