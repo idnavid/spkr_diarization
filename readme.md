@@ -7,8 +7,10 @@ July 2017
 
 
 ## Packages: 
-Spro (for feature extraction)
-AudioSeg (Diarization binaries)
+- Spro (for feature extraction)
+- AudioSeg (Diarization binaries)
+- Python: 
+  - numpy, scipy
 
 
 ## Installation guide:
